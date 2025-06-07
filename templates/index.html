@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pro ToDo App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="app-container">
+    <div class="todo-card">
+      <header>
+        <h1>📝 Welcome to To-Do</h1>
+        <p class="subtitle">Organize tasks. Boost productivity.</p>
+      </header>
+
+      <!-- Task Form -->
+      <section class="form-section">
+        <form action="{{ url_for('add') }}" method="POST" class="task-form">
+          <input type="text" name="content" placeholder="Enter a task..." required />
+          <button type="submit">➕ Add Task</button>
+        </form>
+        {% if tasks %}
+          <p class="task-count">Total Tasks: {{ tasks | length }}</p>
+        {% endif %}
+      </section>
+
+      <!-- Task List -->
+      <section class="task-section">
+        <h2>🗂️ Your Task List</h2>
+        <ul class="task-list">
+          {% for task in tasks %}
+            <li>
+              <form action="{{ url_for('update', task_id=loop.index0) }}" method="POST" class="task-update-form">
+                <div class="task-details">
+                  <input type="text" name="updated_content" value="{{ task.content }}" class="task-edit-input" readonly />
+                  <span class="task-date">{{ task.timestamp }}</span>
+                </div>
+                <div class="actions">
+                  <input type="checkbox" onclick="toggleComplete(this)" />
+                  <button type="button" class="edit-btn" onclick="enableEdit(this)">✏️ Edit</button>
+                  <button type="submit" class="save-btn">💾 Save</button>
+                  <a class="delete-btn" href="{{ url_for('delete', task_id=loop.index0) }}">🗑️</a>
+                </div>
+              </form>
+            </li>
+          {% else %}
+            <li class="no-task">
+              <p>No tasks yet. Start by adding one!</p>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function toggleComplete(checkbox) {
+      const task = checkbox.closest('.task-update-form').querySelector('.task-edit-input');
+      task.classList.toggle('completed');
+    }
+
+    function enableEdit(button) {
+      const input = button.closest('.task-update-form').querySelector('.task-edit-input');
+      input.removeAttribute('readonly');
+      input.focus();
+    }
+  </script>
+</body>
+</html>
